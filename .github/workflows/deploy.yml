@@ -1,0 +1,105 @@
+name: Sync Sheet & Deploy Pages
+
+on:
+  schedule:
+    - cron: "0 */6 * * *" # 6시간마다 (UTC 기준, KST 09/15/21/03시)
+  workflow_dispatch: # Actions 탭에서 수동 실행
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main] # PR 에서는 테스트 + 빌드만 하고 배포하지 않음
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Fetch & clean sheet data
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          SHEET_NAME: ${{ secrets.SHEET_NAME }}
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "PR 빌드: 실데이터 대신 샘플 CSV 사용"
+            python scripts/fetch_data.py --csv data/sample_transactions.csv
+          elif [ -z "$GCP_SA_KEY" ] || [ -z "$SPREADSHEET_ID" ]; then
+            echo "::warning::GCP_SA_KEY / SPREADSHEET_ID 시크릿이 없어 샘플 데이터로 배포합니다."
+            python scripts/fetch_data.py --csv data/sample_transactions.csv
+          else
+            python scripts/fetch_data.py
+          fi
+
+      # 프론트엔드(팀원 B) 형태에 따라 자동 선택:
+      #   package.json 있음 -> npm run build 결과(dist/) 사용 (Vite + React)
+      #   public/ 있음      -> 정적 파일 그대로 사용 (Vanilla JS)
+      #   둘 다 없음        -> 데이터 확인용 임시 페이지
+      - name: Set up Node
+        if: hashFiles('package-lock.json') != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Build site
+        run: |
+          rm -rf _site
+          if [ -f package.json ]; then
+            npm ci
+            npm run build
+            cp -r dist _site
+          elif [ -d public ]; then
+            cp -r public _site
+          else
+            mkdir -p _site
+            cat > _site/index.html <<'EOF'
+          <!doctype html>
+          <meta charset="utf-8">
+          <title>회계장부 대시보드 (준비 중)</title>
+          <p>프론트엔드 준비 중입니다. 데이터: <a href="accounting_data.json">accounting_data.json</a></p>
+          EOF
+          fi
+          cp data/accounting_data.json _site/accounting_data.json
+          ls -la _site
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

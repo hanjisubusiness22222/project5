@@ -23,3 +23,7 @@ service_account*.json
 Thumbs.db
 .vscode/
 .idea/
+
+# Pipeline output (CI에서 생성, 실데이터이므로 커밋 금지)
+data/accounting_data.json
+_site/

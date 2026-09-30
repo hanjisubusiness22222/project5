@@ -1,0 +1,165 @@
+{
+  "last_updated": "2026-09-30 16:56:12",
+  "summary": {
+    "total_income": 3500000,
+    "total_expense": 1202000,
+    "balance": 2298000
+  },
+  "monthly_stats": [
+    {
+      "month": "2026-01",
+      "income": 1000000,
+      "expense": 358000
+    },
+    {
+      "month": "2026-02",
+      "income": 1200000,
+      "expense": 270000
+    },
+    {
+      "month": "2026-03",
+      "income": 1300000,
+      "expense": 574000
+    }
+  ],
+  "category_stats": {
+    "식비": 468000,
+    "기타": 400000,
+    "비품": 193000,
+    "교통비": 141000
+  },
+  "transactions": [
+    {
+      "id": 1,
+      "date": "2026-03-25",
+      "type": "지출",
+      "category": "비품",
+      "item": "프린터 토너",
+      "amount": 76000,
+      "pay_method": "법인카드",
+      "writer": "김철수",
+      "note": ""
+    },
+    {
+      "id": 2,
+      "date": "2026-03-18",
+      "type": "지출",
+      "category": "기타",
+      "item": "행사 대관료",
+      "amount": 400000,
+      "pay_method": "계좌이체",
+      "writer": "홍길동",
+      "note": ""
+    },
+    {
+      "id": 3,
+      "date": "2026-03-10",
+      "type": "지출",
+      "category": "식비",
+      "item": "세미나 다과",
+      "amount": 98000,
+      "pay_method": "법인카드",
+      "writer": "이영희",
+      "note": ""
+    },
+    {
+      "id": 4,
+      "date": "2026-03-04",
+      "type": "수입",
+      "category": "후원",
+      "item": "지역 기업 후원금",
+      "amount": 1300000,
+      "pay_method": "계좌이체",
+      "writer": "홍길동",
+      "note": ""
+    },
+    {
+      "id": 5,
+      "date": "2026-02-27",
+      "type": "지출",
+      "category": "교통비",
+      "item": "KTX 출장",
+      "amount": 118000,
+      "pay_method": "법인카드",
+      "writer": "홍길동",
+      "note": "부산 세미나"
+    },
+    {
+      "id": 6,
+      "date": "2026-02-20",
+      "type": "지출",
+      "category": "비품",
+      "item": "화이트보드 마커",
+      "amount": 32000,
+      "pay_method": "현금",
+      "writer": "김철수",
+      "note": ""
+    },
+    {
+      "id": 7,
+      "date": "2026-02-15",
+      "type": "지출",
+      "category": "식비",
+      "item": "팀 회식",
+      "amount": 120000,
+      "pay_method": "법인카드",
+      "writer": "이영희",
+      "note": "프로젝트 킥오프"
+    },
+    {
+      "id": 8,
+      "date": "2026-02-03",
+      "type": "수입",
+      "category": "회비",
+      "item": "2월 정기 회비",
+      "amount": 1200000,
+      "pay_method": "계좌이체",
+      "writer": "홍길동",
+      "note": ""
+    },
+    {
+      "id": 9,
+      "date": "2026-01-28",
+      "type": "지출",
+      "category": "교통비",
+      "item": "외부 미팅 택시",
+      "amount": 23000,
+      "pay_method": "법인카드",
+      "writer": "이영희",
+      "note": ""
+    },
+    {
+      "id": 10,
+      "date": "2026-01-20",
+      "type": "지출",
+      "category": "비품",
+      "item": "노트북 거치대",
+      "amount": 85000,
+      "pay_method": "법인카드",
+      "writer": "김철수",
+      "note": ""
+    },
+    {
+      "id": 11,
+      "date": "2026-01-12",
+      "type": "지출",
+      "category": "식비",
+      "item": "신입 환영회",
+      "amount": 250000,
+      "pay_method": "법인카드",
+      "writer": "김철수",
+      "note": ""
+    },
+    {
+      "id": 12,
+      "date": "2026-01-05",
+      "type": "수입",
+      "category": "회비",
+      "item": "1월 정기 회비",
+      "amount": 1000000,
+      "pay_method": "계좌이체",
+      "writer": "홍길동",
+      "note": ""
+    }
+  ]
+}
