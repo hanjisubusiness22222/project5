@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회계장부 대시보드 | Accounting Dashboard</title>
+  
+  <!-- Pretendard Font -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- PapaParse CDN for CSV parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      font-family: 'Pretendard', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+          <i data-lucide="wallet" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-slate-900 leading-tight">회계장부 대시보드</h1>
+          <p class="text-xs text-slate-500">Google Sheets 실시간 동기화</p>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="flex items-center space-x-3 text-xs">
+        <span id="syncStatus" class="inline-flex items-center px-2.5 py-1 rounded-full font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+          동기화 준비중
+        </span>
+        <button id="refreshBtn" class="inline-flex items-center px-3 py-1.5 rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 font-medium transition duration-150">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5 mr-1.5"></i>
+          새로고침
+        </button>
+        <a id="sheetLink" href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRJDia7EcGbs_WAAbeOoNHvGXuOKbGNS2G7JhmUKuPfUeVQQ_4ol4j6lygrmByCkg9D6VnSLShSqddI/pubhtml" target="_blank" class="inline-flex items-center px-3 py-1.5 rounded-lg text-blue-600 bg-blue-50 hover:bg-blue-100 font-medium transition duration-150">
+          <i data-lucide="external-link" class="w-3.5 h-3.5 mr-1.5"></i>
+          시트 열기
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner (Alert for empty or demo mode) -->
+  <div id="noticeBanner" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full hidden">
+    <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-start space-x-3">
+      <i data-lucide="alert-circle" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+      <div class="flex-1">
+        <strong class="font-semibold">안내:</strong>
+        <span id="noticeText">구글 시트가 비어있거나 읽을 수 없어 샘플(데모) 데이터 모드로 표시합니다. 구글 시트에 항목을 추가하면 자동으로 전환됩니다.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1 space-y-6">
+
+    <!-- KPI Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <!-- Income Card -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <p class="text-sm font-semibold text-slate-500">총 수입 (Income)</p>
+          <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="trending-up" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="mt-3">
+          <h2 id="totalIncome" class="text-2xl sm:text-3xl font-extrabold text-emerald-600 tracking-tight">0원</h2>
+          <p id="incomeCount" class="text-xs text-slate-400 mt-1">총 0건의 수입 내역</p>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
+      </div>
+
+      <!-- Expense Card -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <p class="text-sm font-semibold text-slate-500">총 지출 (Expense)</p>
+          <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+            <i data-lucide="trending-down" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="mt-3">
+          <h2 id="totalExpense" class="text-2xl sm:text-3xl font-extrabold text-rose-600 tracking-tight">0원</h2>
+          <p id="expenseCount" class="text-xs text-slate-400 mt-1">총 0건의 지출 내역</p>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-400 to-red-500"></div>
+      </div>
+
+      <!-- Balance Card -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <p class="text-sm font-semibold text-slate-500">현재 잔액 (Balance)</p>
+          <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+            <i data-lucide="piggy-bank" class="w-5 h-5"></i>
+          </div>
+        </div>
+        <div class="mt-3">
+          <h2 id="totalBalance" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">0원</h2>
+          <p id="balanceRatio" class="text-xs text-slate-400 mt-1">수입 대비 지출 0%</p>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <!-- Monthly Trend Chart (2 columns) -->
+      <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="bar-chart-3" class="w-4 h-4 text-blue-600"></i>
+            <h3 class="text-base font-bold text-slate-800">월별 수입/지출 추이</h3>
+          </div>
+          <span class="text-xs text-slate-400">최근 거래 기준</span>
+        </div>
+        <div class="relative flex-1 min-h-[260px]">
+          <canvas id="monthlyChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Category Breakdown Chart (1 column) -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="pie-chart" class="w-4 h-4 text-indigo-600"></i>
+            <h3 class="text-base font-bold text-slate-800">카테고리별 지출 비율</h3>
+          </div>
+        </div>
+        <div class="relative flex-1 min-h-[260px] flex items-center justify-center">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters & Table Section -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <!-- Filter Bar -->
+      <div class="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/50 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2.5">
+          <!-- Type Filter -->
+          <select id="typeFilter" class="bg-white border border-slate-300 text-xs font-medium rounded-lg px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="ALL">전체 구분 (수입/지출)</option>
+            <option value="수입">수입만 보기</option>
+            <option value="지출">지출만 보기</option>
+          </select>
+
+          <!-- Category Filter -->
+          <select id="categoryFilter" class="bg-white border border-slate-300 text-xs font-medium rounded-lg px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="ALL">모든 카테고리</option>
+          </select>
+
+          <!-- Reset Filter Button -->
+          <button id="resetFilterBtn" class="text-xs text-slate-500 hover:text-slate-800 px-2 py-1 flex items-center">
+            <i data-lucide="rotate-ccw" class="w-3 h-3 mr-1"></i> 필터 초기화
+          </button>
+        </div>
+
+        <!-- Search Input -->
+        <div class="relative w-full sm:w-64">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+          <input type="text" id="searchInput" placeholder="항목명, 비고, 작성자 검색..." class="w-full bg-white pl-9 pr-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-slate-400">
+        </div>
+      </div>
+
+      <!-- Transaction Table -->
+      <div class="overflow-x-auto custom-scrollbar">
+        <table class="w-full text-left text-sm text-slate-600">
+          <thead class="bg-slate-50 text-xs uppercase text-slate-500 font-semibold border-b border-slate-200">
+            <tr>
+              <th scope="col" class="px-5 py-3">일자</th>
+              <th scope="col" class="px-4 py-3">구분</th>
+              <th scope="col" class="px-4 py-3">카테고리</th>
+              <th scope="col" class="px-5 py-3">항목명</th>
+              <th scope="col" class="px-5 py-3 text-right">금액</th>
+              <th scope="col" class="px-4 py-3">결제수단</th>
+              <th scope="col" class="px-4 py-3">작성자</th>
+              <th scope="col" class="px-5 py-3">비고</th>
+            </tr>
+          </thead>
+          <tbody id="transactionTbody" class="divide-y divide-slate-100 font-normal">
+            <!-- Dynamic rows will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyTableState" class="hidden p-12 text-center text-slate-400">
+        <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
+        <p class="text-sm font-medium">해당 조건에 일치하는 내역이 없습니다.</p>
+      </div>
+
+      <!-- Footer / Pagination Info -->
+      <div class="px-5 py-3.5 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        <div>
+          총 <span id="filteredCount" class="font-semibold text-slate-800">0</span>건 표시 중
+        </div>
+        <div id="lastUpdated" class="text-slate-400">
+          최종 업데이트: -
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400 mt-auto">
+    <p>© 2026 회계장부 프로젝트 | Powered by Google Sheets & GitHub Pages</p>
+  </footer>
+
+  <!-- App Script -->
+  <script src="js/app.js"></script>
+</body>
+</html>
