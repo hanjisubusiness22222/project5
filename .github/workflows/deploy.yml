@@ -1,38 +1,62 @@
-name: Deploy Dashboard to GitHub Pages
+name: Sync Sheet & Deploy Dashboard to GitHub Pages
 
 on:
+  schedule:
+    - cron: "0 */6 * * *" # 6시간마다 (UTC 기준, KST 09/15/21/03시)
+  workflow_dispatch: # Actions 탭에서 수동 실행
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [main]
+  pull_request:
+    branches: [main] # PR 에서는 테스트 + 데이터 수집만 하고 배포하지 않음
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+      # 구글 시트 게시 CSV -> data/accounting_data.json (외부 라이브러리 불필요)
+      - name: Fetch & clean sheet data
+        run: python scripts/fetch_data.py
+
       - name: Setup Pages
+        if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v4
 
-      - name: Upload artifact
+      # 정적 대시보드(index.html, js/, data/)를 저장소 루트 그대로 배포
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: "."
 
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

@@ -41,7 +41,7 @@ flowchart LR
 
 | 역할 | 담당 팀원 | 진행 상태 | 핵심 업무 요약 | 상세 가이드 문서 |
 | :--- | :--- | :---: | :--- | :--- |
-| **Data & CI/CD** | **팀원 A** | 🟡 대기/진행중 | 구글 시트 데이터 추출 스크립트 개발, 데이터 전처리(JSON화), GitHub Actions 자동 배포 | [팀원 A 가이드](docs/roles/01_member_A_data_pipeline.md) |
+| **Data & CI/CD** | **팀원 A** | **✅ 완료** | 구글 시트 CSV 수집·정제·집계 스크립트(`scripts/fetch_data.py`), 단위 테스트, 6시간 주기 자동 동기화 & Pages 배포 워크플로우 | [팀원 A 가이드](docs/roles/01_member_A_data_pipeline.md) |
 | **Frontend UI** | **팀원 B** | **✅ 완료 (100%)** | 반응형 대시보드(다크모드, 엑셀CSV추출, 차트 시각화, 기간/카테고리 필터, 페이지네이션) | [팀원 B 가이드](docs/roles/02_member_B_frontend.md) |
 | **Schema & Ops/QA**| **팀원 C** | 🟡 대기/진행중 | 구글 시트 입력 스키마 정의/유효성 검사, GCP API 및 GitHub Secrets 보안 설정, QA 검증 | [팀원 C 가이드](docs/roles/03_member_C_infrastructure_qa.md) |
 

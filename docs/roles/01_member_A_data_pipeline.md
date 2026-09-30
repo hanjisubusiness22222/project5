@@ -19,16 +19,28 @@
 
 - **연동 대상 시트 CSV 엔드포인트:**
   `https://docs.google.com/spreadsheets/d/e/2PACX-1vRJDia7EcGbs_WAAbeOoNHvGXuOKbGNS2G7JhmUKuPfUeVQQ_4ol4j6lygrmByCkg9D6VnSLShSqddI/pub?gid=0&single=true&output=csv`
-- [ ] 시트 CSV URL 또는 Google Sheets API를 통한 원본 데이터 수집
-- [ ] 데이터 정제 및 유효성 검사
-  - 날짜 형식 통일 (`YYYY-MM-DD`)
-  - 금액 콤마 제거 및 정수형 변환 (`10,000` -> `10000`)
-  - 빈 행 및 결측값 예외 처리
-- [ ] 사전 집계 데이터 생성
+- [x] 시트 CSV URL을 통한 원본 데이터 수집 (표준 라이브러리만 사용, 설치 불필요)
+- [x] 데이터 정제 및 유효성 검사
+  - 날짜 형식 통일 (`YYYY-MM-DD`) — `2026. 3. 5`, `2026/03/05`, `2026년 3월 5일` 등 지원
+  - 금액 콤마 제거 및 정수형 변환 (`10,000`, `₩10,000`, `10000원` -> `10000`)
+  - 빈 행은 무시, 날짜/구분/금액이 잘못된 행은 건너뛰고 몇 번째 행인지 경고 출력
+  - 헤더 별칭 지원 (`날짜`, `분류`, `내역`, `담당자` 등 — `js/app.js`와 동일)
+- [x] 사전 집계 데이터 생성
   - 총 수입, 총 지출, 현재 잔액 계산
   - 월별 수입/지출 추이 데이터 집계
-  - 카테고리별 지출 비율 집계
-- [ ] 프론트엔드용 JSON 파일 내보내기 (`data/accounting_data.json`)
+  - 카테고리별 지출 합계 집계 (금액 큰 순)
+- [x] 프론트엔드용 JSON 파일 내보내기 (`data/accounting_data.json`)
+  - 시트에 유효한 행이 없으면 `data/mock_data.json`으로 대체 (`"source": "mock"`)
+  - 시트 접속 실패 시에는 실패 처리 → 기존 배포본 유지
+- [x] 단위 테스트 (`tests/test_fetch_data.py`)
+
+#### ▶️ 실행 방법
+```bash
+python scripts/fetch_data.py                     # 공용 시트에서 수집
+python scripts/fetch_data.py --csv 파일.csv       # 로컬 CSV로 테스트
+python scripts/fetch_data.py --strict            # 잘못된 행이 있으면 실패 처리
+python -m unittest discover -s tests             # 테스트 실행
+```
 
 #### 📄 최종 출력 JSON 스키마 예시
 ```json
@@ -66,16 +78,17 @@
 ---
 
 ### 2. GitHub Actions 워크플로우 구성 (`.github/workflows/deploy.yml`)
-- [ ] 트리거 설정:
-  - `schedule`: 매일 자정 또는 매 6시간마다 실행 (`cron: '0 0 * * *'`)
+- [x] 트리거 설정:
+  - `schedule`: 매 6시간마다 실행 (`cron: '0 */6 * * *'`, KST 03/09/15/21시)
   - `workflow_dispatch`: GitHub 저장소 Actions 탭에서 버튼 클릭 시 즉시 수동 실행
   - `push` (main 브랜치 코드 수정 시)
-- [ ] 파이프라인 단계:
+  - `pull_request` (main 대상 PR: 테스트 + 데이터 수집만, 배포 안 함)
+- [x] 파이프라인 단계:
   1. 저장소 Checkout
-  2. Python/Node.js 환경 세팅 및 의존성 캐싱
-  3. `fetch_data.py` 실행 (Secrets 주입)
-  4. 프론트엔드 정적 파일 빌드 (필요시)
-  5. GitHub Pages 배포 (`actions/deploy-pages@v4` 활용)
+  2. Python 환경 세팅 (외부 의존성 없음 — 공개 CSV 사용으로 Secrets 불필요)
+  3. 단위 테스트 실행
+  4. `fetch_data.py` 실행 → `data/accounting_data.json` 갱신
+  5. 저장소 루트(정적 대시보드) 그대로 GitHub Pages 배포 (`actions/deploy-pages@v4`)
 
 ---
 
