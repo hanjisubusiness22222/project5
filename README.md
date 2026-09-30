@@ -14,6 +14,18 @@
 
 ---
 
+## 🔗 프로젝트 공용 구글 시트 링크
+
+모든 팀원이 공통으로 사용하고 조회하는 회계장부 원본 링크입니다:
+
+- 📊 **[구글 시트 웹 열람 페이지 (HTML)](https://docs.google.com/spreadsheets/d/e/2PACX-1vRJDia7EcGbs_WAAbeOoNHvGXuOKbGNS2G7JhmUKuPfUeVQQ_4ol4j6lygrmByCkg9D6VnSLShSqddI/pubhtml)**
+- 📥 **[실시간 CSV 데이터 엔드포인트](https://docs.google.com/spreadsheets/d/e/2PACX-1vRJDia7EcGbs_WAAbeOoNHvGXuOKbGNS2G7JhmUKuPfUeVQQ_4ol4j6lygrmByCkg9D6VnSLShSqddI/pub?output=csv)**
+
+> [!NOTE]
+> 위 링크는 "웹에 게시"된 공개 엔드포인트이므로, 팀원 누구나 브라우저에서 바로 열람하거나 스크립트/API로 CSV 데이터를 불러올 수 있습니다.
+
+---
+
 ## 🏗️ 전체 시스템 흐름도
 
 ```mermaid

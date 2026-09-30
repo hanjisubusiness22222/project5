@@ -16,8 +16,10 @@
 ## 📋 세부 업무 및 태스크 목록
 
 ### 1. 데이터 추출 및 전처리 스크립트 개발 (`scripts/fetch_data.py`)
-- [ ] Google Sheets API 연동 인증 로직 구현 (환경변수로 전달된 서비스 계정 JSON 로드)
-- [ ] 시트 내 원본 데이터 가져오기
+
+- **연동 대상 시트 CSV 엔드포인트:**
+  `https://docs.google.com/spreadsheets/d/e/2PACX-1vRJDia7EcGbs_WAAbeOoNHvGXuOKbGNS2G7JhmUKuPfUeVQQ_4ol4j6lygrmByCkg9D6VnSLShSqddI/pub?output=csv`
+- [ ] 시트 CSV URL 또는 Google Sheets API를 통한 원본 데이터 수집
 - [ ] 데이터 정제 및 유효성 검사
   - 날짜 형식 통일 (`YYYY-MM-DD`)
   - 금액 콤마 제거 및 정수형 변환 (`10,000` -> `10000`)
