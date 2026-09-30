@@ -18,7 +18,7 @@
 ### 1. 데이터 추출 및 전처리 스크립트 개발 (`scripts/fetch_data.py`)
 
 - **연동 대상 시트 CSV 엔드포인트:**
-  `https://docs.google.com/spreadsheets/d/e/2PACX-1vRJDia7EcGbs_WAAbeOoNHvGXuOKbGNS2G7JhmUKuPfUeVQQ_4ol4j6lygrmByCkg9D6VnSLShSqddI/pub?output=csv`
+  `https://docs.google.com/spreadsheets/d/e/2PACX-1vRJDia7EcGbs_WAAbeOoNHvGXuOKbGNS2G7JhmUKuPfUeVQQ_4ol4j6lygrmByCkg9D6VnSLShSqddI/pub?gid=0&single=true&output=csv`
 - [ ] 시트 CSV URL 또는 Google Sheets API를 통한 원본 데이터 수집
 - [ ] 데이터 정제 및 유효성 검사
   - 날짜 형식 통일 (`YYYY-MM-DD`)

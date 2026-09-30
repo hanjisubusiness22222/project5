@@ -13,7 +13,7 @@ import io
 from datetime import datetime
 
 # 팀원 공유 구글 시트 실시간 CSV 엔드포인트
-SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRJDia7EcGbs_WAAbeOoNHvGXuOKbGNS2G7JhmUKuPfUeVQQ_4ol4j6lygrmByCkg9D6VnSLShSqddI/pub?output=csv"
+SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRJDia7EcGbs_WAAbeOoNHvGXuOKbGNS2G7JhmUKuPfUeVQQ_4ol4j6lygrmByCkg9D6VnSLShSqddI/pub?gid=0&single=true&output=csv"
 OUTPUT_JSON_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "accounting_data.json")
 MOCK_DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "mock_data.json")
 

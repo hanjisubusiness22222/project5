@@ -29,7 +29,7 @@
 
 - [ ] 구글 시트 입력 서식 템플릿 생성 및 팀원 공유
   - 현재 연결된 회계장부 시트: [구글 시트 바로가기 (HTML)](https://docs.google.com/spreadsheets/d/e/2PACX-1vRJDia7EcGbs_WAAbeOoNHvGXuOKbGNS2G7JhmUKuPfUeVQQ_4ol4j6lygrmByCkg9D6VnSLShSqddI/pubhtml)
-  - CSV 출력 엔드포인트: `https://docs.google.com/spreadsheets/d/e/2PACX-1vRJDia7EcGbs_WAAbeOoNHvGXuOKbGNS2G7JhmUKuPfUeVQQ_4ol4j6lygrmByCkg9D6VnSLShSqddI/pub?output=csv`
+  - CSV 출력 엔드포인트: `https://docs.google.com/spreadsheets/d/e/2PACX-1vRJDia7EcGbs_WAAbeOoNHvGXuOKbGNS2G7JhmUKuPfUeVQQ_4ol4j6lygrmByCkg9D6VnSLShSqddI/pub?gid=0&single=true&output=csv`
 
 ---
 
