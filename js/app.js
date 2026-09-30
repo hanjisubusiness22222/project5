@@ -231,17 +231,36 @@ async function loadData() {
 }
 
 /**
- * 샘플 목업 데이터 로드
+ * 샘플 목업 데이터 로드 (내장 더미 데이터 백업 포함)
  */
 async function loadMockData(showBanner = false, message = "") {
   try {
     const res = await fetch(FALLBACK_MOCK_DATA_URL);
+    if (!res.ok) throw new Error("mock file not found");
     const data = await res.json();
     allTransactions = data;
     onDataLoaded(showBanner, message);
   } catch (error) {
-    console.error("목업 로드 실패:", error);
-    updateSyncStatus("error", "데이터 로드 실패");
+    console.warn("로컬 fetch 제한 또는 네트워크 오류로 내장 더미 데이터를 로드합니다:", error);
+    // 내장 기본 더미 데이터 (CORS나 로컬 file:// 실행 시에도 완벽 보장)
+    allTransactions = [
+      { id: 1, date: "2026-01-05", type: "수입", category: "지원금", item: "2026년 1학기 학과 연구 프로젝트 지원금", amount: 2500000, pay_method: "계좌이체", author: "김연구", note: "학과 사무실 입금" },
+      { id: 2, date: "2026-01-08", type: "지출", category: "비품", item: "연구실 공용 듀얼 모니터 및 거치대", amount: 340000, pay_method: "법인카드", author: "이학생", note: "쿠팡 로켓배송" },
+      { id: 3, date: "2026-01-15", type: "지출", category: "식비", item: "1월 착수 회의 및 식대", amount: 92000, pay_method: "법인카드", author: "김연구", note: "팀원 4인" },
+      { id: 4, date: "2026-01-22", type: "지출", category: "도서/인쇄", item: "AI 및 클라우드 전문 서적 3권", amount: 88000, pay_method: "체크카드", author: "박개발", note: "교보문고" },
+      { id: 5, date: "2026-02-02", type: "수입", category: "회비", item: "프로젝트 팀원 상반기 회비", amount: 400000, pay_method: "계좌이체", author: "최총무", note: "8명 완납" },
+      { id: 6, date: "2026-02-10", type: "지출", category: "소프트웨어", item: "GitHub Team & 도메인 1년 갱신", amount: 145000, pay_method: "법인카드", author: "박개발", note: "해외결제" },
+      { id: 7, date: "2026-02-14", type: "지출", category: "식비", item: "스프린트 개발 다과 및 커피", amount: 42000, pay_method: "개인카드", author: "이학생", note: "스타벅스" },
+      { id: 8, date: "2026-02-20", type: "지출", category: "교통비", item: "개발자 세미나 참석 대중교통비", amount: 26000, pay_method: "개인카드", author: "박개발", note: "KTX 증빙" },
+      { id: 9, date: "2026-03-03", type: "수입", category: "지원금", item: "산학협력 혁신인재 장려금 1차", amount: 1200000, pay_method: "계좌이체", author: "김연구", note: "산학협력단" },
+      { id: 10, date: "2026-03-08", type: "지출", category: "식비", item: "1학기 개강 및 킥오프 회식", amount: 165000, pay_method: "법인카드", author: "김연구", note: "6인 회식" },
+      { id: 11, date: "2026-03-12", type: "지출", category: "소프트웨어", item: "OpenAI API 크레딧 충전 ($50)", amount: 69000, pay_method: "법인카드", author: "박개발", note: "모델 테스트" },
+      { id: 12, date: "2026-03-16", type: "지출", category: "도서/인쇄", item: "중간 보고서 제본 인쇄", amount: 54000, pay_method: "체크카드", author: "이학생", note: "교내 복사실" },
+      { id: 13, date: "2026-03-25", type: "지출", category: "비품", item: "연구실 무선 멀티탭 및 정리함", amount: 31000, pay_method: "법인카드", author: "최총무", note: "다이소" },
+      { id: 14, date: "2026-04-02", type: "수입", category: "기타수입", item: "교내 아이디어 공모전 장려상 상금", amount: 300000, pay_method: "계좌이체", author: "김연구", note: "공용 통장" },
+      { id: 15, date: "2026-04-06", type: "지출", category: "식비", item: "공모전 수상 기념 피자 파티", amount: 78000, pay_method: "법인카드", author: "최총무", note: "팀 축하" }
+    ];
+    onDataLoaded(showBanner, message || "샘플(데모) 회계 데이터가 활성화되었습니다.");
   }
 }
 
