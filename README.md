@@ -14,6 +14,18 @@
 
 ---
 
+## 🔗 프로젝트 공용 구글 시트 링크
+
+모든 팀원이 공통으로 사용하고 조회하는 회계장부 원본 링크입니다:
+
+- 📊 **[구글 시트 웹 열람 페이지 (HTML)](https://docs.google.com/spreadsheets/d/e/2PACX-1vRJDia7EcGbs_WAAbeOoNHvGXuOKbGNS2G7JhmUKuPfUeVQQ_4ol4j6lygrmByCkg9D6VnSLShSqddI/pubhtml)**
+- 📥 **[실시간 CSV 데이터 엔드포인트](https://docs.google.com/spreadsheets/d/e/2PACX-1vRJDia7EcGbs_WAAbeOoNHvGXuOKbGNS2G7JhmUKuPfUeVQQ_4ol4j6lygrmByCkg9D6VnSLShSqddI/pub?gid=0&single=true&output=csv)**
+
+> [!NOTE]
+> 위 링크는 "웹에 게시"된 공개 엔드포인트이므로, 팀원 누구나 브라우저에서 바로 열람하거나 스크립트/API로 CSV 데이터를 불러올 수 있습니다.
+
+---
+
 ## 🏗️ 전체 시스템 흐름도
 
 ```mermaid
@@ -25,17 +37,26 @@ flowchart LR
 
 ---
 
-## 👥 3인 업무 분담 요약
+## 👥 3인 업무 분담 및 진행 현황
 
-각 팀원의 상세 업무 명세서 및 가이드는 아래 링크된 문서에서 확인하실 수 있습니다.
-
-| 역할 | 담당 팀원 | 핵심 업무 요약 | 상세 가이드 문서 |
-| :--- | :--- | :--- | :--- |
-| **Data & CI/CD** | **팀원 A** | 구글 시트 데이터 추출 스크립트 개발, 데이터 전처리(JSON화), GitHub Actions 자동 배포 파이프라인 구축 | [팀원 A 상세 가이드](docs/roles/01_member_A_data_pipeline.md) |
-| **Frontend UI** | **팀원 B** | 대시보드 화면 설계, 수입/지출 요약 카드, 차트 시각화(월별/카테고리별), 필터 및 검색 기능 구현 | [팀원 B 상세 가이드](docs/roles/02_member_B_frontend.md) |
-| **Schema & Ops/QA**| **팀원 C** | 구글 시트 입력 스키마 정의/유효성 검사, GCP API 및 GitHub Secrets 보안 설정, 배포 환경 세팅, 테스트/문서화 | [팀원 C 상세 가이드](docs/roles/03_member_C_infrastructure_qa.md) |
+| 역할 | 담당 팀원 | 진행 상태 | 핵심 업무 요약 | 상세 가이드 문서 |
+| :--- | :--- | :---: | :--- | :--- |
+| **Data & CI/CD** | **팀원 A** | **✅ 완료** | 구글 시트 CSV 수집·정제·집계 스크립트(`scripts/fetch_data.py`), 단위 테스트, 6시간 주기 자동 동기화 & Pages 배포 워크플로우 | [팀원 A 가이드](docs/roles/01_member_A_data_pipeline.md) |
+| **Frontend UI** | **팀원 B** | **✅ 완료 (100%)** | 반응형 대시보드(다크모드, 엑셀CSV추출, 차트 시각화, 기간/카테고리 필터, 페이지네이션) | [팀원 B 가이드](docs/roles/02_member_B_frontend.md) |
+| **Schema & Ops/QA**| **팀원 C** | 🟡 대기/진행중 | 구글 시트 입력 스키마 정의/유효성 검사, GCP API 및 GitHub Secrets 보안 설정, QA 검증 | [팀원 C 가이드](docs/roles/03_member_C_infrastructure_qa.md) |
 
 👉 전체 마일스톤 및 협업 규칙은 [ROLES.md](ROLES.md)를 참고하세요.
+
+---
+
+### ✨ 현재 구현 완료된 대시보드 기능 (팀원 B)
+- 📊 **차트 시각화:** 월별 수입/지출 비교 바 차트, 카테고리별 지출 도넛 차트 (Chart.js)
+- 💳 **카테고리 랭킹:** 지출 상위 카테고리 금액 & 비율(%) 프로그레스 바
+- 🌓 **다크 모드:** 눈이 편안한 Slate 900 딥 다크 모드 원클릭 지원
+- 📅 **기간 프리셋 필터:** 전체 / 이번달 / 최근 3개월 / 올해 원클릭 필터링
+- 📥 **엑셀 호환 CSV 추출:** 현재 필터링된 거래 목록을 한글 깨짐 없이 UTF-8 BOM CSV로 다운로드
+- 📄 **스마트 테이블:** 일자/금액 양방향 정렬, 10개 단위 페이지네이션, 실시간 키워드 검색
+- 🛡️ **2중 스마트 폴백:** 구글 시트 미연동/비어있는 상태에서도 20건의 리얼 샘플 데이터로 완벽 렌더링
 
 ---
 
